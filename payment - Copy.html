@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Simulation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
+                        url("https://images.unsplash.com/photo-1550547660-d9450f859349");
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            width: 450px;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0px 8px 25px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .details {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .details p {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+
+        .total-box {
+            background: #ff5722;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #28a745;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .back-link {
+            margin-top: 15px;
+            display: block;
+            color: #ddd;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        @media(max-width: 480px) {
+            .container {
+                width: 90%;
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>💳 Payment Simulation</h2>
+
+    <div class="details">
+        <p><strong>Item:</strong> {{ item }}</p>
+        <p><strong>Quantity:</strong> {{ quantity }}</p>
+        <p><strong>Slot:</strong> {{ slot }}</p>
+        <p><strong>Price per Item:</strong> ₹{{ total_price // quantity }}</p>
+    </div>
+
+    <div class="total-box">
+        🧾 Total Amount: ₹{{ total_price }}
+    </div>
+
+    <form action="/confirm_payment" method="POST">
+        <input type="hidden" name="item" value="{{ item }}">
+        <input type="hidden" name="quantity" value="{{ quantity }}">
+        <input type="hidden" name="slot" value="{{ slot }}">
+
+        <button type="submit">Confirm & Pay</button>
+    </form>
+
+    <a href="/food" class="back-link">⬅ Cancel & Go Back</a>
+
+</div>
+
+</body>
+</html>

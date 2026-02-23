@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Attendance Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: linear-gradient(to right, #2c3e50, #4ca1af);
+            color: white;
+        }
+
+        .navbar {
+            background: #111;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h2 {
+            margin: 0;
+        }
+
+        .logout-btn {
+            background: red;
+            border: none;
+            padding: 8px 15px;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .container {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .card-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            color: black;
+            padding: 25px;
+            width: 200px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .card h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            color: black;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #222;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .present-btn {
+            background: green;
+            color: white;
+        }
+
+        .absent-btn {
+            background: crimson;
+            color: white;
+        }
+
+        .upload-box {
+            margin: 30px 0;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            color: black;
+        }
+
+        .finalize-btn {
+            background: darkred;
+            color: white;
+            padding: 12px 25px;
+            margin-top: 20px;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            color: white;
+        }
+
+        .present-status {
+            background: green;
+        }
+
+        .absent-status {
+            background: red;
+        }
+
+        .notmarked-status {
+            background: gray;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <h2>Smart Attendance Dashboard</h2>
+        <a href="{{ url_for('dashboard') }}">
+            <button class="logout-btn">Back</button>
+        </a>
+    </div>
+
+    <div class="container">
+
+        <!-- LIVE COUNTERS -->
+        <div class="card-container">
+
+            <div class="card">
+                <h1>{{ total_students }}</h1>
+                <p>Total Students</p>
+            </div>
+
+            <div class="card">
+                <h1>{{ total_present }}</h1>
+                <p>Present</p>
+            </div>
+
+            <div class="card">
+                <h1>{{ total_absent }}</h1>
+                <p>Absent</p>
+            </div>
+
+        </div>
+
+        <!-- AI IMAGE UPLOAD -->
+        <div class="upload-box">
+            <h3>Optional CCTV / Image Upload (AI Automation)</h3>
+
+            <form action="/upload_image" method="POST" enctype="multipart/form-data">
+                <input type="file" name="image" required>
+                <button type="submit">Upload & Detect</button>
+            </form>
+        </div>
+
+        <!-- ATTENDANCE TABLE -->
+        <table>
+            attendance_report.append({
+                "roll": student["roll"],
+                "name": student["name"],
+                "status": "Present" if present else "Absent"
+            })
+            </tr>
+
+            {% for student in students %}
+            {% for student in records %}
+<tr>
+    <td>{{ student.roll }}</td>
+    <td>{{ student.name }}</td>
+
+    <td>
+        <button class="btn btn-success btn-sm">Present</button>
+        <button class="btn btn-danger btn-sm">Absent</button>
+    </td>
+
+    <td>
+        {% if student.status == "Present" %}
+            <span class="badge bg-success">Present ✅</span>
+        {% else %}
+            <span class="badge bg-danger">Absent ❌</span>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+            {% endfor %}
+        </table>
+
+        <br>
+
+        <!-- FINALIZE ATTENDANCE -->
+        <a href="/finalize_attendance">
+            <button class="finalize-btn">
+                Finalize & Notify Absentees
+            </button>
+        </a>
+
+    </div>
+
+</body>
+</html>

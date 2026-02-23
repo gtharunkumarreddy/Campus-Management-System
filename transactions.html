@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transaction History</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
+                        url("https://images.unsplash.com/photo-1550547660-d9450f859349");
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 40px;
+        }
+
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0px 8px 25px rgba(0,0,0,0.5);
+            max-width: 900px;
+            margin: auto;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #ff5722;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        tr:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .total-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #28a745;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 16px;
+            color: #ccc;
+        }
+
+        .btn {
+            display: block;
+            margin: 25px auto 0;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            width: 200px;
+        }
+
+        .btn:hover {
+            background-color: #1976D2;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>💾 Transaction History</h2>
+
+    {% if transactions %}
+
+        <table>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Slot</th>
+                <th>Amount (₹)</th>
+            </tr>
+
+            {% set total_revenue = 0 %}
+            {% for t in transactions %}
+            <tr>
+                <td>{{ t.item }}</td>
+                <td>{{ t.quantity }}</td>
+                <td>{{ t.slot }}</td>
+                <td>₹{{ t.amount }}</td>
+            </tr>
+            {% set total_revenue = total_revenue + t.amount %}
+            {% endfor %}
+        </table>
+
+        <div class="total-box">
+            💰 Total Revenue: ₹{{ total_revenue }}
+        </div>
+
+    {% else %}
+
+        <div class="empty">
+            No transactions yet.
+        </div>
+
+    {% endif %}
+
+    <a href="/dashboard" class="btn">⬅ Back to Dashboard</a>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UPI QR Payment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: #1c1c1e;
+            width: 380px;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        .profile img {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            margin-bottom: 8px;
+        }
+
+        .profile h3 {
+            margin: 5px 0;
+            font-weight: 500;
+        }
+
+        .amount {
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .qr-box {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .qr-box img {
+            width: 220px;
+            height: 220px;
+        }
+
+        .bank {
+            font-size: 14px;
+            margin-top: 10px;
+            color: #ccc;
+        }
+
+        .upi-id {
+            font-size: 13px;
+            margin-top: 5px;
+            color: #aaa;
+        }
+
+        .note {
+            font-size: 12px;
+            color: #888;
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #43a047;
+        }
+
+        .cancel {
+            margin-top: 10px;
+            display: block;
+            color: #bbb;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .cancel:hover {
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <div class="profile">
+        <img src="https://i.pravatar.cc/150?img=3" alt="Profile">
+        <h3>Tharun Reddy</h3>
+    </div>
+
+    <div class="amount">
+        Pay ₹{{ total_price }}
+    </div>
+
+    <div class="qr-box">
+        <img src="{{ url_for('static', filename=qr_image) }}" alt="Dynamic QR Code">
+    </div>
+
+    <div class="bank">
+        🏦 Punjab National Bank 3255
+    </div>
+
+    <div class="upi-id">
+        UPI ID: tharunreddy153-1@okaxis
+    </div>
+
+    <div class="note">
+        Scan using any UPI app (GPay / PhonePe / Paytm)
+    </div>
+
+    <form action="/complete_payment" method="POST">
+        <input type="hidden" name="item" value="{{ item }}">
+        <input type="hidden" name="quantity" value="{{ quantity }}">
+        <input type="hidden" name="slot" value="{{ slot }}">
+        <button type="submit">Payment Completed</button>
+    </form>
+
+    <a href="/food" class="cancel">Cancel & Go Back</a>
+
+</div>
+
+</body>
+</html>

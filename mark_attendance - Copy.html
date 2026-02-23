@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Attendance</title>
+    <style>
+        :root {
+            --bg: #1e1f22;
+            --panel: #ffffff;
+            --panel-muted: #f4f6f8;
+            --text: #111827;
+            --text-muted: #6b7280;
+            --accent: #22c55e;
+            --accent-2: #3b82f6;
+            --danger: #ef4444;
+            --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(1200px 600px at 10% 10%, #2a2b30, #15161a);
+            color: var(--text);
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            color: #ffffff;
+            margin-bottom: 18px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin: 0;
+            letter-spacing: 0.3px;
+        }
+
+        .header p {
+            margin: 6px 0 0;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .card {
+            background: var(--panel);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .action-card {
+            background: var(--panel);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-title {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: var(--panel-muted);
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--accent-2);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-success {
+            background: var(--accent);
+            box-shadow: 0 8px 16px rgba(34, 197, 94, 0.35);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            box-shadow: 0 8px 16px rgba(239, 68, 68, 0.35);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 12px 10px;
+            background: var(--panel-muted);
+            color: #111827;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+        }
+
+        tbody td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            display: inline-block;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            background: #cbd5e1;
+            border-radius: 999px;
+            transition: 0.2s ease;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            left: 3px;
+            top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.2s ease;
+        }
+
+        .toggle input:checked + .slider {
+            background: var(--accent);
+        }
+
+        .toggle input:checked + .slider::before {
+            transform: translateX(20px);
+        }
+
+        .status {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .status.present {
+            color: var(--accent);
+        }
+
+        .status.absent {
+            color: var(--danger);
+        }
+
+        .footer-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .count {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .camera-wrap {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .camera-feed,
+        .captured-photo {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            background: #0f172a;
+            min-height: 220px;
+            object-fit: cover;
+        }
+
+        .camera-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn-secondary {
+            background: #0ea5e9;
+            box-shadow: 0 8px 16px rgba(14, 165, 233, 0.35);
+        }
+
+        @media (max-width: 720px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .footer-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <div>
+                <h1>Attendance Marking</h1>
+                <p>Use face recognition or manually toggle attendance for each student.</p>
+            </div>
+            <a href="{{ url_for('dashboard') }}" style="color:#cbd5e1; text-decoration:none;">Back to Dashboard</a>
+        </div>
+
+        <div class="actions">
+            <div class="action-card">
+                <div class="action-title">Face Recognition</div>
+                <div class="status-pill" id="cameraStatus">Camera idle</div>
+                <button class="btn btn-primary" type="button" id="startCameraBtn">Start Camera</button>
+                <button class="btn btn-secondary" type="button" id="captureBtn">Capture Photo</button>
+                <button class="btn btn-success" type="button" id="detectFaceBtn">Detect Face</button>
+            </div>
+            <div class="action-card">
+                <div class="action-title">Manual Attendance</div>
+                <div class="status-pill" id="submitStatus">Not submitted</div>
+                <button class="btn btn-success" type="button" id="submitBtn">Submit Attendance</button>
+            </div>
+            <div class="action-card">
+                <div class="action-title">Quick Actions</div>
+                <div class="status-pill">Ready</div>
+                <button class="btn btn-danger" type="button" id="resetTopBtn">Reset Toggles</button>
+                <button class="btn btn-danger" type="button" id="stopCameraBtn">Stop Camera</button>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:18px;">
+            <h3 style="margin-top:0;">Camera Capture</h3>
+            <div class="camera-wrap">
+                <div>
+                    <video id="cameraFeed" class="camera-feed" autoplay playsinline muted></video>
+                </div>
+                <div>
+                    <canvas id="captureCanvas" style="display:none;"></canvas>
+                    <img id="capturedPhoto" class="captured-photo" alt="Captured photo will appear here">
+                </div>
+            </div>
+            <div class="camera-actions">
+                <a id="downloadCapture" class="btn btn-success" style="text-decoration:none;display:none;" download="face-capture.png">Download Capture</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:0;">Manual Attendance Table</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Roll No</th>
+                            <th>Name</th>
+                            <th>Course</th>
+                            <th>Semester</th>
+                            <th>Mark</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in students %}
+                        <tr>
+                            <td>{{ s.roll }}</td>
+                            <td>{{ s.name }}</td>
+                            <td>{{ s.course }}</td>
+                            <td>{{ s.semester }}</td>
+                            <td>
+                                <label class="toggle">
+                                    <input type="checkbox" class="attendance-toggle" data-roll="{{ s.roll }}">
+                                    <span class="slider"></span>
+                                </label>
+                            </td>
+                            <td class="status-cell"><span class="status absent">Absent</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="footer-actions">
+                <div class="count">Present: <span id="presentCount">0</span> | Absent: <span id="absentCount">0</span></div>
+                <button class="btn btn-danger" type="button" id="resetBtn">Reset Toggles</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const toggles = Array.from(document.querySelectorAll(".attendance-toggle"));
+        const presentCount = document.getElementById("presentCount");
+        const absentCount = document.getElementById("absentCount");
+        const submitBtn = document.getElementById("submitBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        const resetTopBtn = document.getElementById("resetTopBtn");
+        const submitStatus = document.getElementById("submitStatus");
+        const cameraStatus = document.getElementById("cameraStatus");
+        const startCameraBtn = document.getElementById("startCameraBtn");
+        const captureBtn = document.getElementById("captureBtn");
+        const detectFaceBtn = document.getElementById("detectFaceBtn");
+        const stopCameraBtn = document.getElementById("stopCameraBtn");
+        const cameraFeed = document.getElementById("cameraFeed");
+        const captureCanvas = document.getElementById("captureCanvas");
+        const capturedPhoto = document.getElementById("capturedPhoto");
+        const downloadCapture = document.getElementById("downloadCapture");
+        let cameraStream = null;
+
+        function updateCounts() {
+            const present = toggles.filter(t => t.checked).length;
+            const absent = toggles.length - present;
+            presentCount.textContent = present;
+            absentCount.textContent = absent;
+        }
+
+        toggles.forEach(toggle => {
+            toggle.addEventListener("change", () => {
+                const statusCell = toggle.closest("tr").querySelector(".status");
+                if (toggle.checked) {
+                    statusCell.textContent = "Present";
+                    statusCell.classList.add("present");
+                    statusCell.classList.remove("absent");
+                } else {
+                    statusCell.textContent = "Absent";
+                    statusCell.classList.add("absent");
+                    statusCell.classList.remove("present");
+                }
+                updateCounts();
+            });
+        });
+
+        submitBtn.addEventListener("click", () => {
+            const now = new Date();
+            submitStatus.textContent = "Submitted at " + now.toLocaleTimeString();
+            submitStatus.style.color = "#0f172a";
+            submitStatus.style.background = "#dcfce7";
+        });
+
+        function resetAttendance() {
+            toggles.forEach(toggle => {
+                toggle.checked = false;
+                const statusCell = toggle.closest("tr").querySelector(".status");
+                statusCell.textContent = "Absent";
+                statusCell.classList.add("absent");
+                statusCell.classList.remove("present");
+            });
+            updateCounts();
+        }
+
+        resetBtn.addEventListener("click", resetAttendance);
+        resetTopBtn.addEventListener("click", resetAttendance);
+
+        startCameraBtn.addEventListener("click", async () => {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                cameraFeed.srcObject = cameraStream;
+                cameraStatus.textContent = "Camera live";
+                cameraStatus.style.background = "#dcfce7";
+                cameraStatus.style.color = "#166534";
+            } catch (err) {
+                cameraStatus.textContent = "Camera access denied";
+                cameraStatus.style.background = "#fee2e2";
+                cameraStatus.style.color = "#991b1b";
+            }
+        });
+
+        captureBtn.addEventListener("click", () => {
+            if (!cameraStream) {
+                cameraStatus.textContent = "Start camera first";
+                cameraStatus.style.background = "#fef3c7";
+                cameraStatus.style.color = "#92400e";
+                return;
+            }
+
+            const width = cameraFeed.videoWidth || 640;
+            const height = cameraFeed.videoHeight || 480;
+            captureCanvas.width = width;
+            captureCanvas.height = height;
+
+            const ctx = captureCanvas.getContext("2d");
+            ctx.drawImage(cameraFeed, 0, 0, width, height);
+            const imageUrl = captureCanvas.toDataURL("image/png");
+            capturedPhoto.src = imageUrl;
+            downloadCapture.href = imageUrl;
+            downloadCapture.style.display = "inline-block";
+
+            cameraStatus.textContent = "Photo captured";
+            cameraStatus.style.background = "#dbeafe";
+            cameraStatus.style.color = "#1d4ed8";
+        });
+
+        detectFaceBtn.addEventListener("click", () => {
+            if (!capturedPhoto.src) {
+                cameraStatus.textContent = "Capture photo first";
+                cameraStatus.style.background = "#fef3c7";
+                cameraStatus.style.color = "#92400e";
+                return;
+            }
+
+            fetch("/recognize_capture", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ image: capturedPhoto.src })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.ok) {
+                    cameraStatus.textContent = data.error || "Recognition failed";
+                    cameraStatus.style.background = "#fee2e2";
+                    cameraStatus.style.color = "#991b1b";
+                    return;
+                }
+
+                if (!data.matched) {
+                    cameraStatus.textContent = data.message || "No match detected";
+                    cameraStatus.style.background = "#fef3c7";
+                    cameraStatus.style.color = "#92400e";
+                    return;
+                }
+
+                if (data.auto_marked && data.roll) {
+                    const target = document.querySelector(`.attendance-toggle[data-roll="${data.roll}"]`);
+                    if (target) {
+                        target.checked = true;
+                        const statusCell = target.closest("tr").querySelector(".status");
+                        statusCell.textContent = "Present";
+                        statusCell.classList.add("present");
+                        statusCell.classList.remove("absent");
+                        updateCounts();
+                    }
+                    cameraStatus.textContent = `${data.student_name} marked Present`;
+                    cameraStatus.style.background = "#dcfce7";
+                    cameraStatus.style.color = "#166534";
+                    return;
+                }
+
+                cameraStatus.textContent = data.message || "Detected, no auto-mark";
+                cameraStatus.style.background = "#fef3c7";
+                cameraStatus.style.color = "#92400e";
+            })
+            .catch(() => {
+                cameraStatus.textContent = "Server recognition error";
+                cameraStatus.style.background = "#fee2e2";
+                cameraStatus.style.color = "#991b1b";
+            });
+        });
+
+        stopCameraBtn.addEventListener("click", () => {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+                cameraFeed.srcObject = null;
+            }
+            cameraStatus.textContent = "Camera idle";
+            cameraStatus.style.background = "#f4f6f8";
+            cameraStatus.style.color = "#6b7280";
+        });
+
+        updateCounts();
+    </script>
+</body>
+</html>

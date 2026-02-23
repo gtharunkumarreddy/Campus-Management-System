@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Campus Resource Analytics</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background: url("{{ url_for('static', filename='library.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+
+        .glass-box {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        table {
+            color: white;
+        }
+
+        th {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body class="container py-5">
+
+    <!-- ================= HEADER ================= -->
+
+    <div class="glass-box text-center">
+        <h1>📊 Campus Resource Analytics</h1>
+        <hr>
+
+        <!-- Semester Selector -->
+        <form method="GET">
+            <label>Select Semester:</label>
+            <select name="semester" onchange="this.form.submit()" class="form-select w-25 mx-auto">
+
+                <option value="1-1" {% if semester=="1-1" %}selected{% endif %}>Semester 1-1</option>
+                <option value="1-2" {% if semester=="1-2" %}selected{% endif %}>Semester 1-2</option>
+                <option value="2-1" {% if semester=="2-1" %}selected{% endif %}>Semester 2-1</option>
+                <option value="2-2" {% if semester=="2-2" %}selected{% endif %}>Semester 2-2</option>
+                <option value="3-1" {% if semester=="3-1" %}selected{% endif %}>Semester 3-1</option>
+                <option value="3-2" {% if semester=="3-2" %}selected{% endif %}>Semester 3-2</option>
+                <option value="4-1" {% if semester=="4-1" %}selected{% endif %}>Semester 4-1</option>
+                <option value="4-2" {% if semester=="4-2" %}selected{% endif %}>Semester 4-2</option>
+
+            </select>
+        </form>
+
+        <hr>
+
+        <h4>Total Classroom Capacity: {{ total_capacity }}</h4>
+        <h4>Total Students Enrolled: {{ total_students }}</h4>
+        <h4>Capacity Utilization: {{ utilization }}%</h4>
+
+        <canvas id="utilChart" height="100"></canvas>
+    </div>
+
+
+    <!-- ================= FILTERS ================= -->
+
+    <div class="glass-box">
+        <h3>🔎 Filters (Slicers)</h3>
+
+        <div class="row">
+
+            <!-- Faculty Filter -->
+            <div class="col-md-4">
+                <label>Select Faculty</label>
+                <select id="facultyFilter" class="form-select">
+                    <option value="">All Faculty</option>
+                    {% for f in faculty %}
+                    <option value="{{ f.name }}">{{ f.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Course Filter -->
+            <div class="col-md-4">
+                <label>Select Course</label>
+                <select id="courseFilter" class="form-select">
+                    <option value="">All Courses</option>
+                    {% for c in courses %}
+                    <option value="{{ c.name }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Student Filter -->
+            <div class="col-md-4">
+                <label>Select Student</label>
+                <select id="studentFilter" class="form-select">
+                    <option value="">All Students</option>
+                    {% for s in students %}
+                    <option value="{{ s.name }}">{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ================= CLASSROOM DETAILS ================= -->
+
+    <div class="glass-box">
+        <h3>🏫 Classroom Details</h3>
+        <table class="table table-bordered table-striped data-table">
+            <thead>
+                <tr>
+                    <th>Room No</th>
+                    <th>Type</th>
+                    <th>Capacity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in classrooms %}
+                <tr>
+                    <td>{{ room.room_no }}</td>
+                    <td>{{ room.type }}</td>
+                    <td>{{ room.capacity }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- ================= FACULTY DETAILS ================= -->
+
+    <div class="glass-box">
+        <h3>👨‍🏫 Faculty Details</h3>
+        <table class="table table-bordered table-striped data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Course</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in faculty %}
+                <tr>
+                    <td>{{ f.id }}</td>
+                    <td>{{ f.name }}</td>
+                    <td>{{ f.course }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- ================= COURSE DETAILS ================= -->
+
+    <div class="glass-box">
+        <h3>📚 Course Details</h3>
+        <table class="table table-bordered table-striped data-table">
+            <thead>
+                <tr>
+                    <th>Course Code</th>
+                    <th>Course Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in courses %}
+                <tr>
+                    <td>{{ c.code }}</td>
+                    <td>{{ c.name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- ================= STUDENT DETAILS ================= -->
+
+    <div class="glass-box">
+        <h3>👨‍🎓 Student Details</h3>
+        <table class="table table-bordered table-striped data-table">
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Course</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>{{ s.roll }}</td>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.course }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- ================= CHART SCRIPT ================= -->
+
+    <script>
+        const ctx = document.getElementById('utilChart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Capacity', 'Students'],
+                datasets: [{
+                    label: 'Semester {{ semester }}',
+                    data: [{{ total_capacity }}, {{ total_students }}],
+                    borderWidth: 1
+                }]
+            }
+        });
+    </script>
+
+
+    <!-- ================= FILTER SCRIPT ================= -->
+
+    <script>
+        function filterTables() {
+
+            let faculty = document.getElementById("facultyFilter").value.toLowerCase();
+            let course = document.getElementById("courseFilter").value.toLowerCase();
+            let student = document.getElementById("studentFilter").value.toLowerCase();
+
+            document.querySelectorAll(".data-table tbody tr").forEach(row => {
+
+                let text = row.innerText.toLowerCase();
+                let show = true;
+
+                if (faculty && !text.includes(faculty)) show = false;
+                if (course && !text.includes(course)) show = false;
+                if (student && !text.includes(student)) show = false;
+
+                row.style.display = show ? "" : "none";
+            });
+        }
+
+        document.getElementById("facultyFilter").addEventListener("change", filterTables);
+        document.getElementById("courseFilter").addEventListener("change", filterTables);
+        document.getElementById("studentFilter").addEventListener("change", filterTables);
+    </script>
+
+</body>
+</html>

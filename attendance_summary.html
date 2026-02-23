@@ -1,0 +1,17 @@
+<h1>Attendance Finalized</h1>
+
+<h2>Absentees:</h2>
+<ul>
+{% for student in absentees %}
+    <li>{{ student.name }}</li>
+{% endfor %}
+</ul>
+
+<h2>Notifications Sent:</h2>
+<ul>
+{% for note in notifications %}
+    <li>{{ note }}</li>
+{% endfor %}
+</ul>
+
+<a href="/attendance">Back</a>

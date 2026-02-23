@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Face Enrollment</title>
+    <style>
+        :root {
+            --bg: #1e1f22;
+            --panel: #ffffff;
+            --panel-muted: #f4f6f8;
+            --text: #111827;
+            --text-muted: #6b7280;
+            --accent: #22c55e;
+            --accent-2: #3b82f6;
+            --danger: #ef4444;
+            --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(1200px 600px at 10% 10%, #2a2b30, #15161a);
+            color: var(--text);
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            color: #ffffff;
+            margin-bottom: 18px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin: 0;
+            letter-spacing: 0.3px;
+        }
+
+        .header p {
+            margin: 6px 0 0;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .card {
+            background: var(--panel);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .action-card {
+            background: var(--panel);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-title {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: var(--panel-muted);
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--accent-2);
+        }
+
+        .btn-success {
+            background: var(--accent);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .camera-wrap {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .camera-feed,
+        .captured-photo {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            background: #0f172a;
+            min-height: 220px;
+            object-fit: cover;
+        }
+
+        .student-select {
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 14px;
+            background: #ffffff;
+            color: #111827;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <div>
+                <h1>Student Face Enrollment</h1>
+                <p>Capture a student face and save it to database for attendance recognition.</p>
+            </div>
+            <a href="{{ url_for('dashboard') }}" style="color:#cbd5e1; text-decoration:none;">Back to Dashboard</a>
+        </div>
+
+        <div class="actions">
+            <div class="action-card">
+                <div class="action-title">Camera Control</div>
+                <div class="status-pill" id="enrollStatus">Camera idle</div>
+                <button class="btn btn-primary" type="button" id="startCameraBtn">Start Camera</button>
+                <button class="btn btn-primary" type="button" id="captureBtn">Capture Photo</button>
+                <button class="btn btn-danger" type="button" id="stopCameraBtn">Stop Camera</button>
+            </div>
+            <div class="action-card">
+                <div class="action-title">Save Enrollment</div>
+                <select id="studentSelect" class="student-select">
+                    {% for s in students %}
+                    <option value="{{ s.roll }}">{{ s.roll }} - {{ s.name }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-success" type="button" id="saveFaceBtn">Save To Database</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="camera-wrap">
+                <video id="cameraFeed" class="camera-feed" autoplay playsinline muted></video>
+                <div>
+                    <canvas id="captureCanvas" style="display:none;"></canvas>
+                    <img id="capturedPhoto" class="captured-photo" alt="Captured photo preview">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const startCameraBtn = document.getElementById("startCameraBtn");
+        const captureBtn = document.getElementById("captureBtn");
+        const stopCameraBtn = document.getElementById("stopCameraBtn");
+        const saveFaceBtn = document.getElementById("saveFaceBtn");
+        const studentSelect = document.getElementById("studentSelect");
+        const enrollStatus = document.getElementById("enrollStatus");
+        const cameraFeed = document.getElementById("cameraFeed");
+        const captureCanvas = document.getElementById("captureCanvas");
+        const capturedPhoto = document.getElementById("capturedPhoto");
+        let cameraStream = null;
+
+        startCameraBtn.addEventListener("click", async () => {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                cameraFeed.srcObject = cameraStream;
+                enrollStatus.textContent = "Camera live";
+                enrollStatus.style.background = "#dcfce7";
+                enrollStatus.style.color = "#166534";
+            } catch (err) {
+                enrollStatus.textContent = "Camera access denied";
+                enrollStatus.style.background = "#fee2e2";
+                enrollStatus.style.color = "#991b1b";
+            }
+        });
+
+        captureBtn.addEventListener("click", () => {
+            if (!cameraStream) {
+                enrollStatus.textContent = "Start camera first";
+                enrollStatus.style.background = "#fef3c7";
+                enrollStatus.style.color = "#92400e";
+                return;
+            }
+
+            const width = cameraFeed.videoWidth || 640;
+            const height = cameraFeed.videoHeight || 480;
+            captureCanvas.width = width;
+            captureCanvas.height = height;
+            const ctx = captureCanvas.getContext("2d");
+            ctx.drawImage(cameraFeed, 0, 0, width, height);
+            capturedPhoto.src = captureCanvas.toDataURL("image/png");
+            enrollStatus.textContent = "Photo captured";
+            enrollStatus.style.background = "#dbeafe";
+            enrollStatus.style.color = "#1d4ed8";
+        });
+
+        stopCameraBtn.addEventListener("click", () => {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+                cameraFeed.srcObject = null;
+            }
+            enrollStatus.textContent = "Camera idle";
+            enrollStatus.style.background = "#f4f6f8";
+            enrollStatus.style.color = "#6b7280";
+        });
+
+        saveFaceBtn.addEventListener("click", () => {
+            if (!capturedPhoto.src) {
+                enrollStatus.textContent = "Capture photo before saving";
+                enrollStatus.style.background = "#fef3c7";
+                enrollStatus.style.color = "#92400e";
+                return;
+            }
+
+            fetch("/save_face_capture", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    image: capturedPhoto.src,
+                    roll: studentSelect.value
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.ok) {
+                    enrollStatus.textContent = data.error || "Save failed";
+                    enrollStatus.style.background = "#fee2e2";
+                    enrollStatus.style.color = "#991b1b";
+                    return;
+                }
+                enrollStatus.textContent = data.message;
+                enrollStatus.style.background = "#dcfce7";
+                enrollStatus.style.color = "#166534";
+            })
+            .catch(() => {
+                enrollStatus.textContent = "Save request failed";
+                enrollStatus.style.background = "#fee2e2";
+                enrollStatus.style.color = "#991b1b";
+            });
+        });
+    </script>
+</body>
+</html>

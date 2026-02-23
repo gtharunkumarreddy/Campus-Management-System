@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Remedial Attendance</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #141e30, #243b55);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        .card {
+            background: rgba(0,0,0,0.8);
+            padding: 40px;
+            border-radius: 15px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+        }
+
+        button {
+            width: 95%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            background: #00c6ff;
+            color: black;
+        }
+
+        .message-success {
+            margin-top: 15px;
+            color: #00ff99;
+            font-weight: bold;
+        }
+
+        .message-error {
+            margin-top: 15px;
+            color: #ff4d4d;
+            font-weight: bold;
+        }
+
+        .back-btn {
+            margin-top: 20px;
+            background: orange;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <h2>🎓 Student Remedial Attendance</h2>
+
+    <form method="POST">
+        <input type="text" name="roll" placeholder="Enter Roll Number" required>
+
+        <!-- Auto-fill code if passed from QR -->
+        <input type="text" name="code" placeholder="Enter Remedial Code"
+               value="{{ request.args.get('code','') }}" required>
+
+        <button type="submit">Mark Attendance</button>
+    </form>
+
+    {% if message %}
+        {% if "Success" in message %}
+            <div class="message-success">{{ message }}</div>
+        {% else %}
+            <div class="message-error">{{ message }}</div>
+        {% endif %}
+    {% endif %}
+
+    <a href="/dashboard">
+        <button class="back-btn">⬅ Back to Dashboard</button>
+    </a>
+
+</div>
+
+</body>
+</html>

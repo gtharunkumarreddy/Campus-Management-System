@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cart Preview</title>
+</head>
+<body style="font-family: Arial; padding:40px;">
+
+<h2>🛒 Your Cart</h2>
+
+<table border="1" cellpadding="10">
+<tr>
+    <th>Item</th>
+    <th>Quantity</th>
+    <th>Price</th>
+    <th>Subtotal</th>
+</tr>
+
+{% for item in cart %}
+<tr>
+    <td>{{ item.item }}</td>
+    <td>{{ item.quantity }}</td>
+    <td>₹{{ item.price }}</td>
+    <td>₹{{ item.subtotal }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+<h3>Total Amount: ₹{{ total_price }}</h3>
+
+<form action="/confirm_payment" method="POST">
+
+    {% for item in cart %}
+        <input type="hidden" name="items" value="{{ item.item }}">
+        <input type="hidden" name="quantity_{{ item.item }}" value="{{ item.quantity }}">
+    {% endfor %}
+
+    <input type="hidden" name="slot" value="{{ slot }}">
+    <input type="hidden" name="total_price" value="{{ total_price }}">
+    <input type="hidden" name="total_quantity" value="{{ total_quantity }}">
+
+    <button type="submit">Confirm & Pay</button>
+</form>
+
+</body>
+</html>

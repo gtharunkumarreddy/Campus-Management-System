@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: linear-gradient(to right, #1f4037, #99f2c8);
+        }
+
+        .navbar {
+            background-color: #222;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .navbar h2 {
+            margin: 0;
+        }
+
+        .logout-btn {
+            background-color: red;
+            border: none;
+            padding: 8px 15px;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .dashboard-container {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            margin-bottom: 20px;
+        }
+
+        .card a {
+            text-decoration: none;
+        }
+
+        .card button {
+            background-color: #0066ff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .card button:hover {
+            background-color: #004bcc;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <h2>Admin Dashboard - Smart Campus</h2>
+        <a href="{{ url_for('login') }}">
+            <button class="logout-btn">Logout</button>
+        </a>
+    </div>
+
+    <!-- DASHBOARD CONTENT -->
+    <div class="dashboard-container">
+
+        <h1>Welcome Admin 👨‍💼</h1>
+        <p>Manage all campus systems from here</p>
+
+        <div class="card-container">
+
+            <!-- Attendance -->
+            <div class="card">
+                <h3>📋 Attendance Management</h3>
+                <a href="{{ url_for('attendance_page') }}">
+                    <button>Open Attendance</button>
+                </a>
+            </div>
+
+            <!-- Remedial Scheduling -->
+            <div class="card">
+                <h3>🗓 Schedule Remedial</h3>
+                <a href="{{ url_for('remedial') }}">
+                    <button>Schedule Now</button>
+                </a>
+            </div>
+
+            <!-- View Remedial Attendance -->
+            <div class="card">
+                <h3>📊 View Remedial Attendance</h3>
+                <a href="{{ url_for('view_remedial_attendance') }}">
+                    <button>View Records</button>
+                </a>
+            </div>
+
+            <!-- Smart Food -->
+            <div class="card">
+                <h3>🍔 Smart Food System</h3>
+                <a href="{{ url_for('food') }}">
+                    <button>Open Food System</button>
+                </a>
+            </div>
+
+            <!-- Food Analytics -->
+            <div class="card">
+                <h3>📈 Food Analytics</h3>
+                <a href="{{ url_for('food_analytics') }}">
+                    <button>View Analytics</button>
+                </a>
+            </div>
+
+            <!-- Resource Analytics -->
+            <div class="card">
+                <h3>🏫 Resource Analytics</h3>
+                <a href="{{ url_for('resource_analytics') }}">
+                    <button>Open Resource Dashboard</button>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Schedule Make-Up Class</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+                        url("https://images.unsplash.com/photo-1588072432836-e10032774350");
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
+
+        .container {
+            width: 400px;
+            margin: 80px auto;
+            background: rgba(0,0,0,0.8);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff5722;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e64a19;
+        }
+
+        .back {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .back a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>📚 Schedule Make-Up Class</h2>
+
+    <form method="POST">
+
+        <label>Subject</label>
+        <select name="subject" required>
+            <option value="">Select Subject</option>
+            <option value="Data Structures">Data Structures</option>
+            <option value="DBMS">DBMS</option>
+            <option value="AI">Artificial Intelligence</option>
+            <option value="Operating Systems">Operating Systems</option>
+        </select>
+
+        <label>Faculty</label>
+        <select name="faculty" required>
+            <option value="">Select Faculty</option>
+            <option value="Dr. Kumar">Dr. Kumar</option>
+            <option value="Dr. Reddy">Dr. Reddy</option>
+            <option value="Dr. Sharma">Dr. Sharma</option>
+            <option value="Dr. Priya">Dr. Priya</option>
+        </select>
+
+        <label>Date</label>
+        <input type="date" name="date" required>
+
+        <label>Time Slot</label>
+        <input type="time" name="time" required>
+
+        <button type="submit">Generate Remedial Code</button>
+
+    </form>
+
+    <div class="back">
+        <a href="/dashboard">⬅ Back to Dashboard</a>
+    </div>
+
+</div>
+
+</body>
+</html>

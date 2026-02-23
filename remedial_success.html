@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Remedial Success</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        .card {
+            background: rgba(0,0,0,0.75);
+            padding: 40px;
+            border-radius: 15px;
+            width: 500px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.6);
+        }
+
+        h1 {
+            color: #00ff99;
+        }
+
+        .code-box {
+            background: orange;
+            color: black;
+            font-size: 28px;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .copy-btn {
+            background: #007bff;
+            color: white;
+        }
+
+        .back-btn {
+            background: #00c6ff;
+            color: black;
+            margin-top: 20px;
+        }
+
+        .counter {
+            margin-top: 15px;
+            font-size: 18px;
+            color: #ffcc00;
+        }
+
+        .timer {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #ff4444;
+        }
+
+        img {
+            margin-top: 20px;
+            width: 180px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <h1>✅ Remedial Class Scheduled</h1>
+
+    <div class="code-box" id="code">{{ code }}</div>
+
+    <button class="copy-btn" onclick="copyCode()">📋 Copy Code</button>
+
+    <div class="timer">
+        ⏳ Code Expires In: <span id="countdown">30:00</span>
+    </div>
+
+    <div class="counter">
+        📊 Live Attendance: <span id="attendanceCount">0</span>
+    </div>
+
+    <hr style="margin:20px 0;">
+
+    <p><strong>Subject:</strong> {{ subject }}</p>
+    <p><strong>Faculty:</strong> {{ faculty }}</p>
+    <p><strong>Date:</strong> {{ date }}</p>
+
+    {% if qr_path %}
+        <h3>🔐 QR Code Attendance</h3>
+        <img src="/{{ qr_path }}">
+    {% endif %}
+
+    <br>
+    <a href="/dashboard">
+        <button class="back-btn">⬅ Back to Dashboard</button>
+    </a>
+
+</div>
+
+<script>
+function copyCode() {
+    navigator.clipboard.writeText("{{ code }}");
+    alert("Code Copied Successfully!");
+}
+
+/* Countdown Timer */
+let time = 1800; // 30 minutes in seconds
+let countdown = document.getElementById("countdown");
+
+let timer = setInterval(function () {
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+
+    countdown.innerText =
+        String(minutes).padStart(2, '0') + ":" +
+        String(seconds).padStart(2, '0');
+
+    time--;
+
+    if (time < 0) {
+        clearInterval(timer);
+        countdown.innerText = "EXPIRED";
+    }
+}, 1000);
+
+/* Live Attendance Fetch */
+setInterval(function() {
+    fetch("/remedial_live/{{ code }}")
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("attendanceCount").innerText =
+                data.attendance_count;
+        });
+}, 3000);
+
+</script>
+
+</body>
+</html>

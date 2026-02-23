@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Campus Resource Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url("https://images.unsplash.com/photo-1588072432836-e10032774350") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+
+        .container {
+            width: 80%;
+            margin: 40px auto;
+            background: rgba(0,0,0,0.75);
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .warning {
+            background: #e63946;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding: 5px 0;
+        }
+
+        hr {
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .back {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back a {
+            color: #00d4ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        canvas {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>📊 Campus Resource Analytics</h1>
+
+    <!-- Semester Dropdown -->
+    <form method="GET" action="{{ url_for('resource_analytics') }}">
+        <label>Select Semester: </label>
+        <select name="semester" onchange="this.form.submit()">
+            {% for sem in semesters %}
+                <option value="{{ sem }}"
+                    {% if sem == selected_semester %} selected {% endif %}>
+                    Semester {{ sem }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <br>
+
+    <!-- Capacity Card -->
+    <div class="card">
+        <h3>Total Classroom Capacity: {{ total_capacity }}</h3>
+        <h3>Total Students Enrolled: {{ total_students }}</h3>
+        <h3>Capacity Utilization: {{ utilization }}%</h3>
+    </div>
+
+    <!-- Shortage Warning -->
+    {% if utilization > 85 %}
+    <div class="warning">
+        ⚠ Classroom Shortage Warning! Utilization exceeds 85%
+    </div>
+    {% endif %}
+
+    <hr>
+
+    <!-- Professor List -->
+    <div class="card">
+        <h3>👨‍🏫 Professors in Semester {{ selected_semester }}</h3>
+        <ul>
+            {% for prof in professor_list %}
+                <li>{{ prof }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <hr>
+
+    <!-- Faculty Workload -->
+    <div class="card">
+        <h3>👩‍🏫 Faculty Workload Distribution</h3>
+        <ul>
+            {% for faculty, count in workload.items() %}
+                <li>{{ faculty }} → {{ count }} Courses</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <hr>
+
+    <!-- Workload Graph -->
+    <div class="card">
+        <h3>📈 Workload Graph</h3>
+        <canvas id="workloadChart"></canvas>
+    </div>
+
+    <div class="back">
+        <a href="/dashboard">⬅ Back to Dashboard</a>
+    </div>
+
+</div>
+
+<script>
+    const ctx = document.getElementById('workloadChart').getContext('2d');
+
+    const workloadChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ workload.keys() | list | tojson }},
+            datasets: [{
+                label: 'Courses Assigned',
+                data: {{ workload.values() | list | tojson }},
+                backgroundColor: 'rgba(54, 162, 235, 0.7)'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'black'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Remedial Success</title>
+</head>
+<body>
+
+<h2>Remedial Class Scheduled Successfully ✅</h2>
+
+<h1 style="color:orange;">{{ code }}</h1>
+
+<button onclick="copyCode()">Copy Code</button>
+
+<br><br>
+
+<p><b>Subject:</b> {{ subject }}</p>
+<p><b>Faculty:</b> {{ faculty }}</p>
+<p><b>Date:</b> {{ date }}</p>
+
+<br>
+<a href="/dashboard">← Back to Dashboard</a>
+
+<script>
+function copyCode() {
+    navigator.clipboard.writeText("{{ code }}");
+    alert("Code copied!");
+}
+</script>
+
+</body>
+</html>
